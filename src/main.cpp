@@ -2,7 +2,9 @@
 // Created by os on 8/21/26.
 //
 
-int main() {
+#include "../h/print.h"
+#include "../lib/hw.h"
 
+int main() {
     return 0;
 }
