@@ -4,12 +4,20 @@
 
 #include "../h/MemoryAllocator.hpp"
 #include "../h/print.h"
+#include "../h/RiscV.hpp"
 
 namespace MemoryAllocatorTests {
     void runTests();
 }
 
 int main() {
-    MemoryAllocatorTests::runTests();
+    RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
+
+    printString("PRE ECALL\n");
+
+    __asm__ volatile("ecall");
+
+    printString("POSLE ECALL\n");
+
     return 0;
 }
