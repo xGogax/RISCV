@@ -25,6 +25,12 @@ void RiscV::handleSupervisorTrap() {
     __asm__ volatile ("mv %0, a3" : "=r"(arg3));
     __asm__ volatile ("mv %0, a4" : "=r"(arg4));
 
+    printString("syscode: "); printInteger(syscode); printString("\n");
+    printString("arg1: "); printInteger(arg1); printString("\n");
+    printString("arg2: "); printInteger(arg2); printString("\n");
+    printString("arg3: "); printInteger(arg3); printString("\n");
+    printString("arg4: "); printInteger(arg4); printString("\n");
+
     uint64 ret = 0;
 
     uint64 scause = r_scause();
@@ -35,17 +41,17 @@ void RiscV::handleSupervisorTrap() {
         uint64 volatile sepc = r_sepc() + 4;
         uint64 volatile sstatus = r_sstatus();
 
-        printString("syscode: "); printInteger(syscode); printString("\n");
-
         switch (syscode) {
             case SYS_MEM_ALLOC: {
                 // pretvaramo iz blokova nazad
                 ret = (uint64) MemoryAllocator::getInstance().mem_alloc(arg1 * MEM_BLOCK_SIZE);
+                MemoryAllocator::getInstance().printList();
                 break;
             }
 
             case SYS_MEM_FREE: {
                 ret = (uint64) MemoryAllocator::getInstance().mem_free((void*) arg1);
+                MemoryAllocator::getInstance().printList();
                 break;
             }
 
@@ -94,7 +100,7 @@ void RiscV::handleSupervisorTrap() {
                 break;
             }
         }
-        __asm__ volatile("mv a0, %0" : : "r"(ret));
+        __asm__ volatile("mv a0, %0" : : "r"(ret) : "a0");
 
         w_sstatus(sstatus);
         w_sepc(sepc);

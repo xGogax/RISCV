@@ -5,6 +5,7 @@
 #include "../h/MemoryAllocator.hpp"
 #include "../h/print.h"
 #include "../h/RiscV.hpp"
+#include "../h/syscall_c.hpp"
 
 namespace MemoryAllocatorTests {
     void runTests();
@@ -13,11 +14,21 @@ namespace MemoryAllocatorTests {
 int main() {
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
 
-    printString("PRE ECALL\n");
+    printString("A");
+    printString("NIGGER");
 
-    __asm__ volatile("ecall");
+    void* x = mem_alloc(4);
+    void* y = mem_alloc(10);
+    void* z = mem_alloc(4);
 
-    printString("POSLE ECALL\n");
+    mem_free(y);
 
+    void* k = mem_alloc(7);
+
+    mem_free(x);
+    mem_free(z);
+    mem_free(k);
+
+    printString("ASDSAD");
     return 0;
 }

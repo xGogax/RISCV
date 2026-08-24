@@ -96,7 +96,7 @@ public:
         SYS_SEM_WAIT_N          = 0x25,
         SYS_SEM_SIGNAL_N        = 0x26,
 
-        // Console
+        // Console management
         SYS_GET_C               = 0x41,
         SYS_PUT_C               = 0x42
     };
