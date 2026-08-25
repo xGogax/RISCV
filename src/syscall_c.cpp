@@ -17,7 +17,7 @@ void* mem_alloc(size_t size) {
     void* ret;
     __asm__ volatile("mv %0, a0" : "=r"(ret));
 
-    printString("Uspeli smo, ret: "); printInteger((uint64)ret); printString("\n");
+    printString("return value: "); printInteger((uint64)ret); printString("\n");
     printString("-------------------------------\n");
 
     return ret;

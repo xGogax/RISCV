@@ -14,8 +14,7 @@ namespace MemoryAllocatorTests {
 int main() {
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
 
-    printString("A");
-    printString("NIGGER");
+    void* impossible = mem_alloc(100000000000);
 
     void* x = mem_alloc(4);
     void* y = mem_alloc(10);
@@ -28,6 +27,7 @@ int main() {
     mem_free(x);
     mem_free(z);
     mem_free(k);
+    mem_free(impossible);
 
     printString("ASDSAD");
     return 0;
