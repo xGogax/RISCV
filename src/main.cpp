@@ -3,9 +3,9 @@
 //
 
 #include "../h/MemoryAllocator.hpp"
-#include "../h/print.h"
 #include "../h/RiscV.hpp"
 #include "../h/syscall_c.hpp"
+#include "../h/syscall_cpp.hpp"
 #include "../h/workers.hpp"
 
 namespace MemoryAllocatorTests {
@@ -13,44 +13,46 @@ namespace MemoryAllocatorTests {
 }
 
 int main() {
-    TCB* threads[5] = {};  // nullptr init, defanzivno
-
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
 
-    // Ručno kreiramo "main thread" TCB, bez prolaska kroz thread_create()
-    // koji odbija poziv kad je start_routine == nullptr
-    __asm__ volatile("mv a4, %0" : : "r"(nullptr));      // stack = nullptr
-    __asm__ volatile("mv a3, %0" : : "r"(nullptr));      // arg = nullptr
-    __asm__ volatile("mv a2, %0" : : "r"(nullptr));      // body = nullptr
-    __asm__ volatile("mv a1, %0" : : "r"(&threads[0]));  // handle
-    __asm__ volatile("li a0, 0x11");
-    __asm__ volatile("ecall");
+    // TCB koji predstavlja trenutnu (main/kernel) nit
+    TCB* kernel = TCB::createThread(
+        nullptr,
+        nullptr,
+        mem_alloc(DEFAULT_STACK_SIZE)
+    );
 
-    TCB::running = threads[0];
+    TCB::running = kernel;
 
-    thread_create(&threads[1], workerBodyA, nullptr);
-    printString("Thread A created\n");
-    thread_create(&threads[2], workerBodyB, nullptr);
-    printString("Thread B created\n");
-    thread_create(&threads[3], workerBodyC, nullptr);
-    printString("ThreadC created\n");
-    thread_create(&threads[4], workerBodyD, nullptr);
-    printString("ThreadD created\n");
+    // Kreiranje C++ niti
+    Thread* threads[4];
+
+    threads[0] = new Thread(workerBodyA, nullptr);
+    threads[1] = new Thread(workerBodyB, nullptr);
+    threads[2] = new Thread(workerBodyC, nullptr);
+    threads[3] = new Thread(workerBodyD, nullptr);
+
+    // Startovanje niti
+    threads[0]->start();
+    threads[1]->start();
+    threads[2]->start();
+    threads[3]->start();
 
     MemoryAllocator::getInstance().printList();
 
-    while (!(threads[1]->isFinished() && threads[2]->isFinished() && threads[3]->isFinished() && threads[4]->isFinished())) {
-        thread_dispatch();
+    // Cekamo da se sve niti zavrse
+    while (Scheduler::getSize() > 0) {
+        if (threads[0] && threads[1] && threads[2] && threads[3]) {
+            Thread::dispatch();
+        }
     }
 
-    // threads[0] nema svoj heap-alociran stek, pa ga ne brišemo isto
-    printString("All threads finished, cleaning up...\n");
-    MemoryAllocator::getInstance().printList();
-    for (int i = 1; i < 5; ++i) {
-        delete threads[i];
+    for (Thread* thread : threads) {
         MemoryAllocator::getInstance().printList();
+        delete thread;
     }
-    delete threads[0];
+    delete kernel;
     MemoryAllocator::getInstance().printList();
+
     return 0;
 }

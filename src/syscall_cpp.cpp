@@ -1,0 +1,37 @@
+//
+// Created by os on 8/25/26.
+//
+
+#include "../h/syscall_cpp.hpp"
+
+// THREAD
+
+Thread::Thread(void(*body)(void*), void* arg) : myHandle(nullptr), body(body), arg(arg) {}
+Thread::Thread() : myHandle(nullptr), body(nullptr), arg(nullptr) {}
+
+Thread::~Thread() {}
+
+void Thread::threadWrapper(void *threadPtr) {
+    Thread* thread = (Thread*) threadPtr;
+
+    if (thread->body) {
+        thread->body(thread->arg);
+    } else {
+        thread->run();
+    }
+
+    thread_exit();
+}
+
+int Thread::start() {
+    return thread_create(&myHandle, threadWrapper, (void*) this);
+}
+
+void Thread::dispatch() {
+    thread_dispatch();
+}
+
+int Thread::sleep(time_t) {
+    // need to implement
+    return 0;
+}

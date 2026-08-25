@@ -73,6 +73,7 @@ void RiscV::handleSupervisorTrap() {
             }
 
             case SYS_THREAD_EXIT: {
+                printString("THREAD_EXIT\n");
                 ret = TCB::running->thread_exit();
                 break;
             }

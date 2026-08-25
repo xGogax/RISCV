@@ -78,6 +78,14 @@ public:
         if (!tail) { return 0; }
         return tail->data;
     }
+
+    int size() const {
+        int count = 0;
+        for (Elem* curr = head; curr != nullptr; curr = curr->next) {
+            count++;
+        }
+        return count;
+    }
 };
 
 #endif //PROJECT_BASE_V1_1_LIST_HPP

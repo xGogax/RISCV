@@ -15,3 +15,7 @@ TCB* Scheduler::get() {
 void Scheduler::put(TCB *tcb) {
     readyThreadQueue.addLast(tcb);
 }
+
+int Scheduler::getSize() {
+    return readyThreadQueue.size();
+}
