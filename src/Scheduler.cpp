@@ -4,6 +4,8 @@
 
 #include "../h/Scheduler.hpp"
 
+#include "../h/print.h"
+
 List<TCB> Scheduler::readyThreadQueue;
 
 TCB* Scheduler::get() {

@@ -6,29 +6,51 @@
 #include "../h/print.h"
 #include "../h/RiscV.hpp"
 #include "../h/syscall_c.hpp"
+#include "../h/workers.hpp"
 
 namespace MemoryAllocatorTests {
     void runTests();
 }
 
 int main() {
+    TCB* threads[5] = {};  // nullptr init, defanzivno
+
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
 
-    void* impossible = mem_alloc(100000000000);
+    // Ručno kreiramo "main thread" TCB, bez prolaska kroz thread_create()
+    // koji odbija poziv kad je start_routine == nullptr
+    __asm__ volatile("mv a4, %0" : : "r"(nullptr));      // stack = nullptr
+    __asm__ volatile("mv a3, %0" : : "r"(nullptr));      // arg = nullptr
+    __asm__ volatile("mv a2, %0" : : "r"(nullptr));      // body = nullptr
+    __asm__ volatile("mv a1, %0" : : "r"(&threads[0]));  // handle
+    __asm__ volatile("li a0, 0x11");
+    __asm__ volatile("ecall");
 
-    void* x = mem_alloc(4);
-    void* y = mem_alloc(10);
-    void* z = mem_alloc(4);
+    TCB::running = threads[0];
 
-    mem_free(y);
+    thread_create(&threads[1], workerBodyA, nullptr);
+    printString("Thread A created\n");
+    thread_create(&threads[2], workerBodyB, nullptr);
+    printString("Thread B created\n");
+    thread_create(&threads[3], workerBodyC, nullptr);
+    printString("ThreadC created\n");
+    thread_create(&threads[4], workerBodyD, nullptr);
+    printString("ThreadD created\n");
 
-    void* k = mem_alloc(7);
+    MemoryAllocator::getInstance().printList();
 
-    mem_free(x);
-    mem_free(z);
-    mem_free(k);
-    mem_free(impossible);
+    while (!(threads[1]->isFinished() && threads[2]->isFinished() && threads[3]->isFinished() && threads[4]->isFinished())) {
+        thread_dispatch();
+    }
 
-    printString("ASDSAD");
+    // threads[0] nema svoj heap-alociran stek, pa ga ne brišemo isto
+    printString("All threads finished, cleaning up...\n");
+    MemoryAllocator::getInstance().printList();
+    for (int i = 1; i < 5; ++i) {
+        delete threads[i];
+        MemoryAllocator::getInstance().printList();
+    }
+    delete threads[0];
+    MemoryAllocator::getInstance().printList();
     return 0;
 }
