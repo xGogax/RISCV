@@ -5,6 +5,7 @@
 #ifndef PROJECT_BASE_V1_1_SYSCALL_C_HPP
 #define PROJECT_BASE_V1_1_SYSCALL_C_HPP
 
+#include "SemaphoreK.hpp"
 #include "TCB.hpp"
 #include "../lib/hw.h"
 
@@ -20,6 +21,14 @@ int thread_exit();
 void thread_dispatch();
 
 // Semaphore management
+typedef SemaphoreK* sem_t;
+
+int sem_open(sem_t* handle, unsigned init);
+int sem_close(sem_t* handle);
+int sem_wait(sem_t id);
+int sem_signal(sem_t id);
+int sem_wait_n(sem_t id, unsigned n);
+int sem_signal_n(sem_t id, unsigned n);
 
 // Console management
 

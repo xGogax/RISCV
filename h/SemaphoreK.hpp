@@ -10,14 +10,14 @@
 
 class SemaphoreK {
 public:
-    SemaphoreK(unsigned val) : s(val), closed(false) {}
+    SemaphoreK(unsigned val) : s(val), closed(false) {} // 0x21
 
-    int signal();
-    int wait();
-    int signal_n(unsigned n);
-    int wait_n(unsigned n);
+    int signal();               // 0x24
+    int wait();                 // 0x23
+    int signal_n(unsigned n);   // 0x26
+    int wait_n(unsigned n);     // 0x25
 
-    int close();
+    int close();                // 0x22
 
 private:
     int s;

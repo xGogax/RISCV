@@ -29,16 +29,19 @@ private:
     static void threadWrapper(void* threadPtr);
 };
 
-// class Semaphore {
-// public:
-//     Semaphore(unsigned int = 1);
-//     virtual ~Semaphore();
-//
-//     int wait();
-//     int signal();
-// private:
-//     sem_t myHandle;
-// };
+class Semaphore {
+public:
+    Semaphore(unsigned int = 1);
+    virtual ~Semaphore();
+
+    int wait();
+    int signal();
+
+    int wait_n(unsigned n);
+    int signal_n(unsigned n);
+private:
+    sem_t myHandle;
+};
 
 // class PeriodicThread : public Thread {
 // public:

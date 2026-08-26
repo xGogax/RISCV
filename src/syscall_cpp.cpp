@@ -35,3 +35,29 @@ int Thread::sleep(time_t) {
     // need to implement
     return 0;
 }
+
+// SEMAPHORE
+
+Semaphore::Semaphore(unsigned init) : myHandle(nullptr) {
+    sem_open(&myHandle, init);
+}
+
+Semaphore::~Semaphore() {
+    sem_close(&myHandle);
+}
+
+int Semaphore::wait() {
+    return sem_wait(myHandle);
+}
+
+int Semaphore::signal() {
+    return sem_signal(myHandle);
+}
+
+int Semaphore::wait_n(unsigned n) {
+    return sem_wait_n(myHandle, n);
+}
+
+int Semaphore::signal_n(unsigned n) {
+    return sem_signal_n(myHandle, n);
+}

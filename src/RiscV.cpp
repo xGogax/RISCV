@@ -6,6 +6,7 @@
 
 #include "../h/MemoryAllocator.hpp"
 #include "../h/print.h"
+#include "../h/SemaphoreK.hpp"
 #include "../h/TCB.hpp"
 
 void RiscV::popSppSpie() {
@@ -89,26 +90,65 @@ void RiscV::handleSupervisorTrap() {
             }
 
             case SYS_SEM_OPEN: {
+                printString("SEM_CREATED\n");
+                SemaphoreK* sem = new SemaphoreK((unsigned) arg2);
+
+                if (sem==nullptr) ret = -1;
+                else {
+                    *(SemaphoreK**) arg1 = sem;
+                    ret = 0;
+                }
+
                 break;
             }
 
             case SYS_SEM_CLOSE: {
+                SemaphoreK* sem = (SemaphoreK*) arg1;
+
+                if (sem == nullptr) ret = -1;
+                else {
+                    ret = sem->close();
+                    if (ret == 0) delete sem;
+                }
                 break;
             }
 
             case SYS_SEM_WAIT: {
+                SemaphoreK* sem = (SemaphoreK*)arg1;
+
+                if (sem == nullptr) ret = -1;
+                else ret = sem->wait();
                 break;
             }
 
             case SYS_SEM_SIGNAL: {
+                SemaphoreK* sem = (SemaphoreK*)arg1;
+
+                if (sem == nullptr) ret = -1;
+                else ret = sem->signal();
                 break;
             }
 
             case SYS_SEM_WAIT_N: {
+                SemaphoreK* sem = (SemaphoreK*) arg1;
+                if (sem == nullptr) ret = -1;
+                else ret = sem->wait_n((unsigned) arg2);
                 break;
             }
 
             case SYS_SEM_SIGNAL_N: {
+                SemaphoreK* sem = (SemaphoreK*) arg1;
+
+                if (sem == nullptr) ret = -1;
+                else ret = sem->signal_n((unsigned) arg2);
+                break;
+            }
+
+            case SYS_GET_C: {
+                break;
+            }
+
+            case SYS_PUT_C: {
                 break;
             }
 

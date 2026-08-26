@@ -72,3 +72,84 @@ void thread_dispatch() {
 
     __asm__ volatile("ecall");
 }
+
+int sem_open(sem_t* handle, unsigned init) {
+    if (!handle) return -1;
+
+    __asm__ volatile("mv a2, %0" : : "r"(init));
+    __asm__ volatile("mv a1, %0" : : "r"(handle));
+    __asm__ volatile("li a0, 0x21");
+
+    __asm__ volatile("ecall");
+
+    int ret;
+    __asm__ volatile("mv %0, a0" : "=r"(ret));
+    return ret;
+}
+
+int sem_close(sem_t*handle) {
+    if (!handle) return -1;
+
+    __asm__ volatile("mv a1, %0" : : "r"(handle));
+    __asm__ volatile("li a0, 0x22");
+
+    __asm__ volatile("ecall");
+
+    int ret;
+    __asm__ volatile("mv %0, a0" : "=r"(ret));
+    return ret;
+}
+
+int sem_wait(sem_t id) {
+    if (!id) return -1;
+
+    __asm__ volatile("mv a1, %0" : : "r"(id));
+    __asm__ volatile("li a0, 0x23");
+
+    __asm__ volatile("ecall");
+
+    int ret;
+    __asm__ volatile("mv %0, a0" : "=r"(ret));
+    return ret;
+}
+
+int sem_signal(sem_t id) {
+    if (!id) return -1;
+
+    __asm__ volatile("mv a1, %0" : : "r"(id));
+    __asm__ volatile("li a0, 0x24");
+
+    __asm__ volatile("ecall");
+
+    int ret;
+    __asm__ volatile("mv %0, a0" : "=r"(ret));
+    return ret;
+}
+
+int sem_wait_n(sem_t id, unsigned n) {
+    if (!id || n == 0) return -1;
+
+    __asm__ volatile("mv a2, %0" : : "r"(n));
+    __asm__ volatile("mv a1, %0" : : "r"(id));
+    __asm__ volatile("li a0, 0x25");
+
+    __asm__ volatile("ecall");
+
+    int ret;
+    __asm__ volatile("mv %0, a0" : "=r"(ret));
+    return ret;
+}
+
+int sem_signal_n(sem_t id, unsigned n) {
+    if (!id || n == 0) return -1;
+
+    __asm__ volatile("mv a2, %0" : : "r"(n));
+    __asm__ volatile("mv a1, %0" : : "r"(id));
+    __asm__ volatile("li a0, 0x26");
+
+    __asm__ volatile("ecall");
+
+    int ret;
+    __asm__ volatile("mv %0, a0" : "=r"(ret));
+    return ret;
+}
