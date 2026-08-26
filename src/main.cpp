@@ -19,7 +19,7 @@ int main() {
     TCB* kernel = TCB::createThread(
         nullptr,
         nullptr,
-        mem_alloc(DEFAULT_STACK_SIZE)
+        mem_alloc(DEFAULT_STACK_SIZE / MEM_BLOCK_SIZE)
     );
 
     TCB::running = kernel;

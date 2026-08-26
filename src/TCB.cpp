@@ -24,7 +24,7 @@ int TCB::thread_exit() {
 
 void TCB::dispatch() {
     TCB* old = running;
-    if(old && !old->isFinished()) { Scheduler::put(old); }
+    if(old && !old->isFinished() && !old->isBlocked()) { Scheduler::put(old); }
     running = Scheduler::get();
     if (running && running != old) TCB::contextSwitch(&old->context, &running->context);
 }

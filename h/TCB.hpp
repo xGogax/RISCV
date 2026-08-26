@@ -34,6 +34,12 @@ public:
     ThreadPrivilege getPrivilege() const { return privilege; }
     void setPrivilege(ThreadPrivilege val) { privilege = val; }
 
+    bool isBlocked() const { return blocked; }
+    void setBlocked(bool val) { blocked = val; }
+
+    unsigned getSemWaitN() const { return semWaitN; }
+    void setSemWaitN(unsigned n) { semWaitN = n; }
+
 private:
     static uint64 timeSliceCounter;
 
@@ -49,7 +55,9 @@ private:
     context({(uint64) &threadWrapper, this->stack != nullptr ? (uint64) &this->stack[STACK_SIZE] : 0}),
     timeSlice(TIME_SLICE),
     finished(false),
-    privilege(P_USER) {
+    privilege(P_USER),
+    blocked(false),
+    semWaitN(0) {
         if (body != nullptr) { Scheduler::put(this); }
     }
 
@@ -65,6 +73,9 @@ private:
     uint64 timeSlice;
     bool finished;
     ThreadPrivilege privilege;
+
+    bool blocked; // semaphore
+    unsigned semWaitN;
 
     static void contextSwitch(Context* oldContext, Context* newContext);    // contextSwitch.S
     static void threadWrapper();
