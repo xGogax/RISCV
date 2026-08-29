@@ -43,7 +43,7 @@ Semaphore::Semaphore(unsigned init) : myHandle(nullptr) {
 }
 
 Semaphore::~Semaphore() {
-    sem_close(&myHandle);
+    sem_close(myHandle);
 }
 
 int Semaphore::wait() {
@@ -60,4 +60,12 @@ int Semaphore::wait_n(unsigned n) {
 
 int Semaphore::signal_n(unsigned n) {
     return sem_signal_n(myHandle, n);
+}
+
+char Console::getc() {
+    return ::getc();
+}
+
+void Console::putc(char c) {
+    ::putc(c);
 }

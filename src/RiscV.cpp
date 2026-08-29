@@ -8,10 +8,20 @@
 #include "../h/print.h"
 #include "../h/SemaphoreK.hpp"
 #include "../h/TCB.hpp"
+#include "../lib/console.h"
 
 void RiscV::popSppSpie() {
     __asm__ volatile("csrw sepc, ra");
-    __asm__ volatile ("sret");
+
+    if (TCB::running->getPrivilege() == P_USER) {
+        // SPP = 0 -> sret prelazi u U-mode
+        __asm__ volatile("csrc sstatus, %0" : : "r"(1UL << 8));
+    } else {
+        // SPP = 1 -> sret ostaje u S-mode
+        __asm__ volatile("csrs sstatus, %0" : : "r"(1UL << 8));
+    }
+
+    __asm__ volatile("sret");
 }
 
 void RiscV::handleSupervisorTrap() {
@@ -57,7 +67,7 @@ void RiscV::handleSupervisorTrap() {
             }
 
             case SYS_THREAD_CREATE: {
-                printString("THREAD_CREATE\n");
+                printStringK("THREAD_CREATE\n");
                 TCB* thread = TCB::createThread(
                     (TCB::Body) arg2,
                     (void*) arg3,
@@ -74,7 +84,7 @@ void RiscV::handleSupervisorTrap() {
             }
 
             case SYS_THREAD_EXIT: {
-                printString("THREAD_EXIT\n");
+                printStringK("THREAD_EXIT\n");
                 ret = TCB::running->thread_exit();
                 break;
             }
@@ -86,11 +96,12 @@ void RiscV::handleSupervisorTrap() {
             }
 
             case SYS_TIME_SLEEP: {
+                ret = 0;
                 break;
             }
 
             case SYS_SEM_OPEN: {
-                printString("SEM_CREATED\n");
+                printStringK("SEM_CREATED\n");
                 SemaphoreK* sem = new SemaphoreK((unsigned) arg2);
 
                 if (sem==nullptr) ret = -1;
@@ -145,15 +156,18 @@ void RiscV::handleSupervisorTrap() {
             }
 
             case SYS_GET_C: {
+                ret = (uint64) __getc();
                 break;
             }
 
             case SYS_PUT_C: {
+                __putc((char) arg1);
+                ret = 0;
                 break;
             }
 
             default: {
-                printString("wrong code.\n");
+                printStringK("wrong code.\n");
                 break;
             }
         }
@@ -164,7 +178,6 @@ void RiscV::handleSupervisorTrap() {
     } else if (scause == 0x8000000000000001UL) {
         // interrupt: YES
         // cause code: supervisor software interrupt (timer)
-        printString("INTERRUPT TIMER \n");
 
         TCB::timeSliceCounter++;
         if (TCB::timeSliceCounter >= TCB::running->timeSlice) {
@@ -179,15 +192,14 @@ void RiscV::handleSupervisorTrap() {
     } else if (scause == 0x8000000000000009UL) {
         // interrupt: YES
         // cause code: supervisor external interrupt (console)
-        printString("INTERRUPT CONSOLE \n");
         console_handler();
     } else {
         // unexpected error
-        printString("ERROR\n");
-        printString("scause: "); printInteger(scause), printString("\n");
-        printString("sepc:   "); printInteger(r_sepc()), printString("\n");
-        printString("stval:  "); printInteger(r_stval()), printString("\n");
-        printString("\nKernel stopped.\n");
+        printStringK("ERROR\n");
+        printStringK("scause: "); printIntegerK(scause), printStringK("\n");
+        printStringK("sepc:   "); printIntegerK(r_sepc()), printStringK("\n");
+        printStringK("stval:  "); printIntegerK(r_stval()), printStringK("\n");
+        printStringK("\nKernel stopped.\n");
 
         // emulator stop
         __asm__ volatile("li t0, 0x5555");

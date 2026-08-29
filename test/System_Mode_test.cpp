@@ -1,11 +1,7 @@
-//
-// Created by os on 8/25/26.
-//
 
-#ifndef PROJECT_BASE_V1_1_WORKERS_HPP
-#define PROJECT_BASE_V1_1_WORKERS_HPP
-#include "print.h"
-#include "syscall_c.h"
+#include "../h/syscall_c.h"
+
+#include "printing.hpp"
 
 static volatile bool finishedA = false;
 static volatile bool finishedB = false;
@@ -20,19 +16,19 @@ static uint64 fibonacci(uint64 n) {
 
 static void workerBodyA(void* arg) {
     for (uint64 i = 0; i < 10; i++) {
-        printStringK("A: i="); printIntegerK(i); printStringK("\n");
+        printString("A: i="); printInt(i); printString("\n");
         for (uint64 j = 0; j < 10000; j++) {
             for (uint64 k = 0; k < 30000; k++) { /* busy wait */ }
             thread_dispatch();
         }
     }
-    printStringK("A finished!\n");
+    printString("A finished!\n");
     finishedA = true;
 }
 
 static void workerBodyB(void* arg) {
     for (uint64 i = 0; i < 16; i++) {
-        printStringK("B: i="); printIntegerK(i); printStringK("\n");
+        printString("B: i="); printInt(i); printString("\n");
         for (uint64 j = 0; j < 10000; j++) {
             for (uint64 k = 0; k < 30000; k++) { /* busy wait */ }
             thread_dispatch();
@@ -41,7 +37,7 @@ static void workerBodyB(void* arg) {
             asm volatile("csrr t6, sepc");
         }
     }
-    printStringK("B finished!\n");
+    printString("B finished!\n");
     finishedB = true;
     thread_dispatch();
 }
@@ -49,26 +45,26 @@ static void workerBodyB(void* arg) {
 static void workerBodyC(void* arg) {
     uint8 i = 0;
     for (; i < 3; i++) {
-        printStringK("C: i="); printIntegerK(i); printStringK("\n");
+        printString("C: i="); printInt(i); printString("\n");
     }
 
-    printStringK("C: dispatch\n");
+    printString("C: dispatch\n");
     __asm__ ("li t1, 7");
     thread_dispatch();
 
     uint64 t1 = 0;
     __asm__ ("mv %[t1], t1" : [t1] "=r"(t1));
 
-    printStringK("C: t1="); printIntegerK(t1); printStringK("\n");
+    printString("C: t1="); printInt(t1); printString("\n");
 
     uint64 result = fibonacci(12);
-    printStringK("C: fibonaci="); printIntegerK(result); printStringK("\n");
+    printString("C: fibonaci="); printInt(result); printString("\n");
 
     for (; i < 6; i++) {
-        printStringK("C: i="); printIntegerK(i); printStringK("\n");
+        printString("C: i="); printInt(i); printString("\n");
     }
 
-    printStringK("A finished!\n");
+    printString("A finished!\n");
     finishedC = true;
     thread_dispatch();
 }
@@ -76,23 +72,42 @@ static void workerBodyC(void* arg) {
 static void workerBodyD(void* arg) {
     uint8 i = 10;
     for (; i < 13; i++) {
-        printStringK("D: i="); printIntegerK(i); printStringK("\n");
+        printString("D: i="); printInt(i); printString("\n");
     }
 
-    printStringK("D: dispatch\n");
+    printString("D: dispatch\n");
     __asm__ ("li t1, 5");
     thread_dispatch();
 
     uint64 result = fibonacci(16);
-    printStringK("D: fibonaci="); printIntegerK(result); printStringK("\n");
+    printString("D: fibonaci="); printInt(result); printString("\n");
 
     for (; i < 16; i++) {
-        printStringK("D: i="); printIntegerK(i); printStringK("\n");
+        printString("D: i="); printInt(i); printString("\n");
     }
 
-    printStringK("D finished!\n");
+    printString("D finished!\n");
     finishedD = true;
     thread_dispatch();
 }
 
-#endif //PROJECT_BASE_V1_1_WORKERS_HPP
+
+void System_Mode_test() {
+    thread_t threads[4];
+    thread_create(&threads[0], workerBodyA, nullptr);
+    printString("ThreadA created\n");
+
+    thread_create(&threads[1], workerBodyB, nullptr);
+    printString("ThreadB created\n");
+
+    thread_create(&threads[2], workerBodyC, nullptr);
+    printString("ThreadC created\n");
+
+    thread_create(&threads[3], workerBodyD, nullptr);
+    printString("ThreadD created\n");
+
+    while (!(finishedA && finishedB && finishedC && finishedD)) {
+        thread_dispatch();
+    }
+
+}

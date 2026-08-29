@@ -18,7 +18,7 @@ MemoryAllocator::MemoryAllocator() : head(nullptr) {
     head->isFree = true;
     head->next = nullptr;
 
-    printString("Memory allocator initialized.\n");
+    printStringK("Memory allocator initialized.\n");
 }
 
 BlockHeader* MemoryAllocator::bestFit(size_t neededBlocks) {
@@ -101,23 +101,23 @@ int MemoryAllocator::mem_free(void* ptr) {
 void MemoryAllocator::printList() {
     BlockHeader* curr = head;
 
-    printString("\n--- MEMORY LIST ---\n");
+    printStringK("\n--- MEMORY LIST ---\n");
 
     while (curr != nullptr) {
-        printString("[ ");
+        printStringK("[ ");
 
         if (curr->isFree) {
-            printString("FREE");
+            printStringK("FREE");
         } else {
-            printString("ALOC");
+            printStringK("ALOC");
         }
 
-        printString(" | blocks: ");
-        printInteger(curr->totalBlocks);
+        printStringK(" | blocks: ");
+        printIntegerK(curr->totalBlocks);
 
-        printString(" ] -> ");
+        printStringK(" ] -> ");
 
         curr = curr->next;
     }
-    printString("NULL\n");
+    printStringK("NULL\n");
 }

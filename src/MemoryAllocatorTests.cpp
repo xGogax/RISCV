@@ -4,16 +4,16 @@
 namespace MemoryAllocatorTests {
 
 static void printTest(const char* name) {
-    printString("\n==============================\n");
-    printString(name);
-    printString("\n==============================\n");
+    printStringK("\n==============================\n");
+    printStringK(name);
+    printStringK("\n==============================\n");
 }
 
 static void printResult(bool success) {
     if (success)
-        printString("PASS\n");
+        printStringK("PASS\n");
     else
-        printString("FAIL\n");
+        printStringK("FAIL\n");
 }
 
 
@@ -34,13 +34,13 @@ static bool testBasicAlloc() {
         return false;
     }
 
-    printString("Allocation successful!\n");
+    printStringK("Allocation successful!\n");
 
     allocator.printList();
 
     allocator.mem_free(p);
 
-    printString("After free:\n");
+    printStringK("After free:\n");
     allocator.printList();
 
     printResult(true);
@@ -65,7 +65,7 @@ static bool testSplit() {
         return false;
     }
 
-    printString("After first allocation:\n");
+    printStringK("After first allocation:\n");
     allocator.printList();
 
     void* p2 = allocator.mem_alloc(100);
@@ -75,13 +75,13 @@ static bool testSplit() {
         return false;
     }
 
-    printString("After second allocation:\n");
+    printStringK("After second allocation:\n");
     allocator.printList();
 
     allocator.mem_free(p1);
     allocator.mem_free(p2);
 
-    printString("After freeing both:\n");
+    printStringK("After freeing both:\n");
     allocator.printList();
 
     printResult(true);
@@ -114,7 +114,7 @@ static bool testBestFit() {
         return false;
     }
 
-    printString("Initial state:\n");
+    printStringK("Initial state:\n");
     allocator.printList();
 
     //
@@ -127,7 +127,7 @@ static bool testBestFit() {
     allocator.mem_free(b);
     allocator.mem_free(d);
 
-    printString("After freeing B and D:\n");
+    printStringK("After freeing B and D:\n");
     allocator.printList();
 
     //
@@ -143,7 +143,7 @@ static bool testBestFit() {
         return false;
     }
 
-    printString("After best-fit allocation:\n");
+    printStringK("After best-fit allocation:\n");
     allocator.printList();
 
     //
@@ -153,7 +153,7 @@ static bool testBestFit() {
     allocator.mem_free(c);
     allocator.mem_free(x);
 
-    printString("Final state:\n");
+    printStringK("Final state:\n");
     allocator.printList();
 
     printResult(true);
@@ -180,7 +180,7 @@ static bool testMergeNext() {
         return false;
     }
 
-    printString("Initial:\n");
+    printStringK("Initial:\n");
     allocator.printList();
 
     //
@@ -190,12 +190,12 @@ static bool testMergeNext() {
     //
     allocator.mem_free(b);
 
-    printString("After freeing B:\n");
+    printStringK("After freeing B:\n");
     allocator.printList();
 
     allocator.mem_free(c);
 
-    printString("After freeing C:\n");
+    printStringK("After freeing C:\n");
     allocator.printList();
 
     //
@@ -203,7 +203,7 @@ static bool testMergeNext() {
     //
     allocator.mem_free(a);
 
-    printString("Final:\n");
+    printStringK("Final:\n");
     allocator.printList();
 
     printResult(true);
@@ -230,7 +230,7 @@ static bool testMergePrevious() {
         return false;
     }
 
-    printString("Initial:\n");
+    printStringK("Initial:\n");
     allocator.printList();
 
     //
@@ -238,7 +238,7 @@ static bool testMergePrevious() {
     //
     allocator.mem_free(a);
 
-    printString("After freeing A:\n");
+    printStringK("After freeing A:\n");
     allocator.printList();
 
     //
@@ -248,7 +248,7 @@ static bool testMergePrevious() {
     //
     allocator.mem_free(b);
 
-    printString("After freeing B:\n");
+    printStringK("After freeing B:\n");
     allocator.printList();
 
     //
@@ -256,7 +256,7 @@ static bool testMergePrevious() {
     //
     allocator.mem_free(c);
 
-    printString("Final:\n");
+    printStringK("Final:\n");
     allocator.printList();
 
     printResult(true);
@@ -283,12 +283,12 @@ static bool testReuse() {
         return false;
     }
 
-    printString("Initial:\n");
+    printStringK("Initial:\n");
     allocator.printList();
 
     allocator.mem_free(b);
 
-    printString("After freeing B:\n");
+    printStringK("After freeing B:\n");
     allocator.printList();
 
     //
@@ -301,14 +301,14 @@ static bool testReuse() {
         return false;
     }
 
-    printString("After allocating 50 bytes:\n");
+    printStringK("After allocating 50 bytes:\n");
     allocator.printList();
 
     allocator.mem_free(a);
     allocator.mem_free(c);
     allocator.mem_free(x);
 
-    printString("Final:\n");
+    printStringK("Final:\n");
     allocator.printList();
 
     printResult(true);
@@ -321,10 +321,10 @@ static bool testReuse() {
 //
 void runTests() {
 
-    printString("\n");
-    printString("====================================\n");
-    printString("       MEMORY ALLOCATOR TESTS\n");
-    printString("====================================\n");
+    printStringK("\n");
+    printStringK("====================================\n");
+    printStringK("       MEMORY ALLOCATOR TESTS\n");
+    printStringK("====================================\n");
 
     testBasicAlloc();
     testSplit();
@@ -333,10 +333,10 @@ void runTests() {
     testMergePrevious();
     testReuse();
 
-    printString("\n");
-    printString("====================================\n");
-    printString("           TESTS FINISHED\n");
-    printString("====================================\n");
+    printStringK("\n");
+    printStringK("====================================\n");
+    printStringK("           TESTS FINISHED\n");
+    printStringK("====================================\n");
 }
 
 }

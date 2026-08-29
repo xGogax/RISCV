@@ -7,10 +7,9 @@
 
 #include "RiscV.hpp"
 #include "../lib/hw.h"
-#include "../h/RiscV.hpp"
 #include "../lib/console.h"
 
-inline void printString(char const *string) {
+inline void printStringK(char const *string) {
     uint64 sstatus = RiscV::r_sstatus();
     RiscV::mc_sstatus(RiscV::SSTATUS_SIE);
 
@@ -22,7 +21,7 @@ inline void printString(char const *string) {
     RiscV::ms_sstatus(sstatus & RiscV::SSTATUS_SIE ? RiscV::SSTATUS_SIE : 0);
 }
 
-inline void printInteger(uint64 integer) {
+inline void printIntegerK(uint64 integer) {
     uint64 sstatus = RiscV::r_sstatus();
     RiscV::mc_sstatus(RiscV::SSTATUS_SIE);
 

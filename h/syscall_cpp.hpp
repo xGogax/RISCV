@@ -5,7 +5,7 @@
 #ifndef PROJECT_BASE_V1_1_SYSCALL_CPP_HPP
 #define PROJECT_BASE_V1_1_SYSCALL_CPP_HPP
 
-#include "../h/syscall_c.hpp"
+#include "../h/syscall_c.h"
 
 class Thread {
 public:
@@ -55,10 +55,10 @@ private:
 //     time_t period;
 // };
 
-// class Console {
-// public:
-//     static char getc();
-//     static void putc(char);
-// };
+class Console {
+public:
+    static char getc();
+    static void putc(char);
+};
 
 #endif //PROJECT_BASE_V1_1_SYSCALL_CPP_HPP
